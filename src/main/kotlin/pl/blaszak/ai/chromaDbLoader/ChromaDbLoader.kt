@@ -4,6 +4,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import pl.blaszak.ai.chromaDbLoader.service.ChromaDbLoaderDocumentSpliter
+
 import pl.blaszak.ai.chromaDbLoader.service.ChromaDbService
 import pl.blaszak.ai.chromaDbLoader.service.MetadataService
 import pl.blaszak.ai.chromaDbLoader.service.OpenAiEmbeddingService
@@ -15,6 +17,7 @@ import kotlin.system.exitProcess
 @SpringBootApplication
 class ChromaDbLoader (
     val metadataService: MetadataService,
+    val documentSpliter: ChromaDbLoaderDocumentSpliter,
 	val openAiService: OpenAiEmbeddingService,
 	val chromaDbService: ChromaDbService
 ) : CommandLineRunner {
@@ -33,7 +36,7 @@ class ChromaDbLoader (
         val files = mdFileList(dirPath)
 		files.forEach { file ->
 			val content = readMarkdownContent(file)
-			val chunks = chunkText(content, 300)
+			val chunks = documentSpliter.split(content)
 			val mainMetadata = metadataService.getMetadata(content.take(500).split("\n"))
 			logger.info("==== ${file.name} ====")
 			chunks.forEachIndexed { i, chunk ->
@@ -57,18 +60,6 @@ class ChromaDbLoader (
         val dir = File(dirPath)
         if (!dir.exists()) error("Directory not found: $dir")
         return dir.walkTopDown().filter { it.extension == "md" }.toList()
-    }
-
-    private fun chunkText(content: String, maxWordsPerChunk: Int = 300): MutableList<String> {
-        val words = content.split("\\s+".toRegex())
-        val chunks = mutableListOf<String>()
-        var i = 0
-        while (i < words.size) {
-            val chunk = words.subList(i, minOf(i + maxWordsPerChunk, words.size)).joinToString(" ")
-            chunks.add(chunk)
-            i += maxWordsPerChunk
-        }
-        return chunks
     }
 }
 
