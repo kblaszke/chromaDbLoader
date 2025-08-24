@@ -1,4 +1,4 @@
-package pl.blaszak.ai.chromaloader.model
+package pl.blaszak.ai.chromaDbLoader.model
 
 data class ChromaDbRequest(val collection: String,
                            val ids: List<String>,

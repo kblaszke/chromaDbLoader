@@ -1,4 +1,4 @@
-package pl.blaszak.ai.chromaloader.service
+package pl.blaszak.ai.chromaDbLoader.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -6,9 +6,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import pl.blaszak.ai.chromaloader.exception.ChromaDbLoaderException
-import pl.blaszak.ai.chromaloader.model.EmbeddingRequest
-import pl.blaszak.ai.chromaloader.model.EmbeddingResponse
+import pl.blaszak.ai.chromaDbLoader.exception.ChromaDbLoaderException
+import pl.blaszak.ai.chromaDbLoader.model.EmbeddingRequest
+import pl.blaszak.ai.chromaDbLoader.model.EmbeddingResponse
 
 class OpenAiEmbeddingService(private val apiKey: String) {
 

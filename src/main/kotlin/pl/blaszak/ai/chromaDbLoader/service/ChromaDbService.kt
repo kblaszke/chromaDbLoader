@@ -1,4 +1,4 @@
-package pl.blaszak.ai.chromaloader.service
+package pl.blaszak.ai.chromaDbLoader.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import okhttp3.MediaType.Companion.toMediaType
@@ -6,12 +6,12 @@ import org.slf4j.LoggerFactory
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import pl.blaszak.ai.chromaloader.exception.ChromaDbLoaderException
-import pl.blaszak.ai.chromaloader.model.ChromaDbRequest
+import pl.blaszak.ai.chromaDbLoader.exception.ChromaDbLoaderException
+import pl.blaszak.ai.chromaDbLoader.model.ChromaDbRequest
 
 class ChromaDbService(private val baseChromaUrl: String) {
 
-    val LOGGER = LoggerFactory.getLogger(ChromaDbService::class.java)
+    val logger = LoggerFactory.getLogger(ChromaDbService::class.java)
 
     val objectMapper = jacksonObjectMapper()
     private val client = OkHttpClient()
@@ -28,7 +28,7 @@ class ChromaDbService(private val baseChromaUrl: String) {
         val request = createRequest(requestBody)
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
-                LOGGER.error("Error writing to ChromaDB: ${response.code} ${response.message}")
+                logger.error("Error writing to ChromaDB: ${response.code} ${response.message}")
             }
         }
     }
@@ -48,8 +48,8 @@ class ChromaDbService(private val baseChromaUrl: String) {
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
                 val errorBody = response.body?.string()
-                LOGGER.error("Error fetching collections: ${response.code} ${response.message}")
-                LOGGER.debug("response body: ${errorBody ?: "empty"}")
+                logger.error("Error fetching collections: ${response.code} ${response.message}")
+                logger.debug("response body: ${errorBody ?: "empty"}")
                 return emptyList()
             }
 

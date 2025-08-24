@@ -1,0 +1,21 @@
+spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4
+          temperature: 0.7
+      embedding:
+        model: text-embedding-3-small
+db:
+  chroma:
+    url: http://localhost:8000
+    collection: dhamma_talks
+    cleanDataDelay: 3600000
+logging:
+  level:
+    root: INFO
+    pl.blaszak.ai.qdrantLoader: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

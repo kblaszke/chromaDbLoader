@@ -1,4 +1,4 @@
-package pl.blaszak.ai.chromaloader.model
+package pl.blaszak.ai.chromaDbLoader.model
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 

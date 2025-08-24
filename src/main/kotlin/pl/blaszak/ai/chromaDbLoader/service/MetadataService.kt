@@ -1,4 +1,6 @@
-package pl.blaszak.ai.chromaloader.service
+package pl.blaszak.ai.chromaDbLoader.service
+
+import kotlin.collections.iterator
 
 class MetadataService(val metaAttrMap: Map<String, String>) {
 
