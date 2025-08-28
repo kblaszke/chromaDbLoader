@@ -1,10 +1,15 @@
 package pl.blaszak.ai.chromaDbLoader.service
 
-class MetadataService(private val metaAttrMap: Map<String, String>) {
+import kotlin.collections.iterator
 
-    fun getMetadata(lines: List<String>): Map<String, Any?> =
-        metaAttrMap.mapNotNull { (key, prefix) ->
-            lines.firstOrNull { it.startsWith(prefix) }
-                ?.let { key to it.removePrefix(prefix).trim() }
-        }.toMap()
+class MetadataService(val metaAttrMap: Map<String, String>) {
+
+    fun getMetadata(fileName: String, lines: List<String>): Map<String, Any?> =
+        buildMap {
+            put("fileName", fileName)
+            metaAttrMap.forEach { (key, prefix) ->
+                lines.firstOrNull { it.startsWith(prefix)}
+                    ?.let {put(key, it.removePrefix(prefix).trim())}
+            }
+        }
 }

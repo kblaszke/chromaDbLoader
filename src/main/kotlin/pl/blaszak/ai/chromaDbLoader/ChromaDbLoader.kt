@@ -34,7 +34,7 @@ class ChromaDbLoader(
 		mdFileList(dirPath).forEach { file ->
 			val content = file.readText()
 			val chunks = documentSpliter.split(content)
-			val mainMetadata = metadataService.getMetadata(content.take(500).lines())
+			val mainMetadata = metadataService.getMetadata(file.name, content.take(500).lines())
 			logger.info("==== ${file.name} ====")
 			chunks.forEachIndexed { i, chunk ->
 				val embedding = openAiService.getEmbedding(chunk)
