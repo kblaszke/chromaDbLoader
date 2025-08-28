@@ -12,33 +12,30 @@ import pl.blaszak.ai.chromaDbLoader.model.EmbeddingResponse
 
 class OpenAiEmbeddingService(private val apiKey: String) {
 
-    val objectMapper = jacksonObjectMapper()
-    val okHttpClient = OkHttpClient()
+    private val objectMapper = jacksonObjectMapper()
+    private val okHttpClient = OkHttpClient()
 
     fun getEmbedding(inputText: String): List<Float> {
+        require(inputText.isNotBlank()) { "Input text must not be blank" }
         val request = createRequest(inputText)
-        okHttpClient.newCall(request).execute().use {
-            if (!it.isSuccessful) {
-                throw ChromaDbLoaderException("Failed to fetch embedding: ${it.code} ${it.message}")
+        okHttpClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) {
+                throw ChromaDbLoaderException("Failed to fetch embedding: ${response.code} ${response.message}")
             }
-            val responseBody = it.body?.string()
+            val responseBody = response.body?.string()
                 ?: throw ChromaDbLoaderException("Empty response from OpenAI")
-
-            val embeddingResponse = objectMapper.readValue<EmbeddingResponse>(responseBody)
-            return embeddingResponse.data.first().embedding
+            return objectMapper.readValue<EmbeddingResponse>(responseBody).data.first().embedding
         }
     }
 
-    private fun createRequest(inputText: String): Request {
-        val payload = EmbeddingRequest(inputText)
-        val requestBody = objectMapper.writeValueAsString(payload)
-        return createApiRequest(requestBody)
-    }
+    private fun createRequest(inputText: String): Request =
+        createApiRequest(objectMapper.writeValueAsString(EmbeddingRequest(inputText)))
 
-    private fun createApiRequest(requestBody: String) = Request.Builder()
-        .url("https://api.openai.com/v1/embeddings")
-        .header("Authorization", "Bearer $apiKey")
-        .header("Content-Type", "application/json")
-        .post(requestBody.toRequestBody("application/json".toMediaType()))
-        .build()
+    private fun createApiRequest(requestBody: String): Request =
+        Request.Builder()
+            .url("https://api.openai.com/v1/embeddings")
+            .header("Authorization", "Bearer $apiKey")
+            .header("Content-Type", "application/json")
+            .post(requestBody.toRequestBody("application/json".toMediaType()))
+            .build()
 }

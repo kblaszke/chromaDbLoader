@@ -11,9 +11,8 @@ import pl.blaszak.ai.chromaDbLoader.model.ChromaDbRequest
 
 class ChromaDbService(private val baseChromaUrl: String) {
 
-    val logger = LoggerFactory.getLogger(ChromaDbService::class.java)
-
-    val objectMapper = jacksonObjectMapper()
+    private val logger = LoggerFactory.getLogger(ChromaDbService::class.java)
+    private val objectMapper = jacksonObjectMapper()
     private val client = OkHttpClient()
 
     fun addEmbedding(
@@ -23,6 +22,7 @@ class ChromaDbService(private val baseChromaUrl: String) {
         document: String,
         metadata: Map<String, Any?>
     ) {
+        require(collection.isNotBlank()) { "Collection name must not be blank" }
         val payload = ChromaDbRequest(collection, id, embedding, document, metadata)
         val requestBody = objectMapper.writeValueAsString(payload)
         val request = createRequest(requestBody)
@@ -47,18 +47,16 @@ class ChromaDbService(private val baseChromaUrl: String) {
 
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
-                val errorBody = response.body?.string()
                 logger.error("Error fetching collections: ${response.code} ${response.message}")
-                logger.debug("response body: ${errorBody ?: "empty"}")
+                logger.debug("response body: ${response.body?.string() ?: "empty"}")
                 return emptyList()
             }
 
             val responseBody = response.body?.string()
                 ?: throw ChromaDbLoaderException("No server response")
 
-            val collections = objectMapper.readTree(responseBody)
-            return collections.mapNotNull { it["name"]?.asText() }
+            return objectMapper.readTree(responseBody)
+                .mapNotNull { it["name"]?.asText() }
         }
     }
-
 }
